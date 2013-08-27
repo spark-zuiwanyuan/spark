@@ -61,6 +61,7 @@ import spark.scheduler.cluster.{StandaloneSchedulerBackend, SparkDeployScheduler
   ClusterScheduler, Schedulable, SchedulingMode}
 import spark.scheduler.local.LocalScheduler
 import spark.scheduler.mesos.{CoarseMesosSchedulerBackend, MesosSchedulerBackend}
+import spark.scheduler.sparrow.SparrowScheduler
 import spark.storage.{StorageStatus, StorageUtils, RDDInfo, BlockManagerSource}
 import spark.ui.SparkUI
 import spark.util.{MetadataCleaner, TimeStampedHashMap}
@@ -159,6 +160,8 @@ class SparkContext(
     val SPARK_REGEX = """(spark://.*)""".r
     //Regular expression for connection to Mesos cluster
     val MESOS_REGEX = """(mesos://.*)""".r
+    // Regular expression for connecting to a Sparrow cluster.
+    val SPARROW_REGEX = """sparrow@([A-Za-z0-9\.]+):([0-9]+)""".r
 
     master match {
       case "local" =>
@@ -175,6 +178,9 @@ class SparkContext(
         val backend = new SparkDeploySchedulerBackend(scheduler, this, sparkUrl, appName)
         scheduler.initialize(backend)
         scheduler
+
+      case SPARROW_REGEX(host, port) =>
+        new SparrowScheduler(this, host, port, appName)
 
       case LOCAL_CLUSTER_REGEX(numSlaves, coresPerSlave, memoryPerSlave) =>
         // Check to make sure memory requested <= memoryPerSlave. Otherwise Spark will just hang.
