@@ -28,12 +28,12 @@ import spark.storage.BlockManagerMessages._
 
 private[spark] class BlockManagerMaster(var driverActor: ActorRef) extends Logging {
 
-  val AKKA_RETRY_ATTEMPTS: Int = System.getProperty("spark.akka.num.retries", "3").toInt
+  val AKKA_RETRY_ATTEMPTS: Int = System.getProperty("spark.akka.num.retries", "300").toInt
   val AKKA_RETRY_INTERVAL_MS: Int = System.getProperty("spark.akka.retry.wait", "3000").toInt
 
   val DRIVER_AKKA_ACTOR_NAME = "BlockManagerMaster"
 
-  val timeout = Duration.create(System.getProperty("spark.akka.askTimeout", "10").toLong, "seconds")
+  val timeout = Duration.create(System.getProperty("spark.akka.askTimeout", "1").toLong, "seconds")
 
   /** Remove a dead executor from the driver actor. This is only called on the driver side. */
   def removeExecutor(execId: String) {

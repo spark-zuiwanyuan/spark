@@ -180,7 +180,7 @@ class SparkContext(
         scheduler
 
       case SPARROW_REGEX(host, port) =>
-        new SparrowScheduler(this, host, port, appName)
+        new SparrowScheduler(this, host, port, System.getProperty("sparrow.app.name", "spark"))
 
       case LOCAL_CLUSTER_REGEX(numSlaves, coresPerSlave, memoryPerSlave) =>
         // Check to make sure memory requested <= memoryPerSlave. Otherwise Spark will just hang.

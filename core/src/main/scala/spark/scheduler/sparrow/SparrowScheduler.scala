@@ -41,7 +41,7 @@ private[spark] class SparrowScheduler(
   extends TaskScheduler with FrontendService.Iface with Logging {
     
   private val client = new SparrowFrontendClient
-  private val user = new TUserGroupInfo
+  private val user = new TUserGroupInfo("sparkUser", "group", 0)
   private val taskId = new AtomicInteger
   private var listener: TaskSchedulerListener = null
 
@@ -62,7 +62,7 @@ private[spark] class SparrowScheduler(
         t.preferredLocations.foreach(p => placement.addToNodes(p.host))
         placement
       }
-      spec.setMessage(Utils.serialize(t))
+      spec.setMessage(Task.serializeWithDependencies(t, sc.addedFiles, sc.addedJars, ser))
       val tid = taskId.incrementAndGet().toString()
       tidToTask(tid) = t
       spec.setTaskId(tid)
