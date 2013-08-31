@@ -95,6 +95,9 @@ private object HttpBroadcast extends Logging {
           createServer()
         }
         serverUri = System.getProperty("spark.httpBroadcast.uri")
+        if (!isDriver) {
+          logInfo("Connecting to HTTP broadcast server at " + serverUri)
+        }
         initialized = true
       }
     }
@@ -113,7 +116,7 @@ private object HttpBroadcast extends Logging {
 
   private def createServer() {
     broadcastDir = Utils.createTempDir(Utils.getLocalDir)
-    val serverPort = System.getProperty("spark.broadcast.port", 0)
+    val serverPort = System.getProperty("spark.broadcast.port", "0").toInt
     server = new HttpServer(broadcastDir, serverPort)
     server.start()
     serverUri = server.uri
@@ -124,6 +127,7 @@ private object HttpBroadcast extends Logging {
   def write(id: Long, value: Any) {
     val file = new File(broadcastDir, "broadcast-" + id)
     val out: OutputStream = {
+      logInfo("compress set to: " + compress)
       if (compress) {
         compressionCodec.compressedOutputStream(new FileOutputStream(file))
       } else {
@@ -139,6 +143,7 @@ private object HttpBroadcast extends Logging {
 
   def read[T](id: Long): T = {
     val url = serverUri + "/broadcast-" + id
+    logInfo("Attempting to read from " + url + " with compression " + compress)
     val in = {
       if (compress) {
         compressionCodec.compressedInputStream(new URL(url).openStream())

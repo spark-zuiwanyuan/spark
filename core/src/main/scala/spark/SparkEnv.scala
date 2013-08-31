@@ -156,6 +156,7 @@ object SparkEnv extends Logging {
 
     val serializerManager = new SerializerManager
 
+    logInfo("Hi! I'm using this serializer: " + System.getProperty("spark.serializer", "spark.JavaSerializer"))
     val serializer = serializerManager.setDefault(
       System.getProperty("spark.serializer", "spark.JavaSerializer"))
 

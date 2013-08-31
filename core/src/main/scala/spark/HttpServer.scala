@@ -82,7 +82,7 @@ private[spark] class HttpServer(resourceBase: File, port: Int = 0) extends Loggi
     if (server == null) {
       throw new ServerStateException("Server is not started")
     } else {
-      return "http://" + Utils.localIpAddress + ":" + port
+      return "http://" + Utils.localIpAddress + ":" + boundPort
     }
   }
 }
