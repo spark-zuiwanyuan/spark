@@ -69,9 +69,13 @@ private[spark] class SparrowScheduler(
       spec
     })
 
+    val description = "%s-%s".format(
+      taskSet.properties.getProperty(SparkContext.SPARK_JOB_DESCRIPTION, ""),
+      taskSet.stageId)
+
     new Thread(new Runnable() {
       override def run() {
-        client.submitJob(frameworkName, sparrowTasks.toList, user)
+        client.submitJob(frameworkName, sparrowTasks.toList, user, description)
         logInfo("Submitted taskSet with id=%s time=%s".format(taskSet.id, System.currentTimeMillis))
       }
     }).start()
