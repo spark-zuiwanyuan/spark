@@ -112,27 +112,4 @@ if [ "x" != "x$YARN_CONF_DIR" ]; then
   CLASSPATH="$CLASSPATH:$YARN_CONF_DIR"
 fi
 
-# Add shark jars
-SHARK_HOME="/Users/kayo/Documents/shark"
-CLASSPATH+=:$SHARK_HOME/target/scala-$SCALA_VERSION/classes
-for jar in `find $SHARK_HOME/lib -name '*jar'`; do
-  CLASSPATH+=:$jar
-done
-for jar in `find $SHARK_HOME/lib_managed/jars -name '*jar'`; do
-  CLASSPATH+=:$jar
-done
-for jar in `find $SHARK_HOME/lib_managed/bundles -name '*jar'`; do
-  CLASSPATH+=:$jar
-done
-
-# Add hive jars
-export HIVE_HOME="/Users/kayo/Documents/hive/build/dist"
-# Add Hive jars.
-for jar in `find $HIVE_HOME/lib -name '*jar'`; do
-  # Ignore the logging library since it has already been included with the Spark jar.
-  if [[ "$jar" != *slf4j* ]]; then
-    CLASSPATH+=:$jar
-  fi
-done
-
 echo "$CLASSPATH"
