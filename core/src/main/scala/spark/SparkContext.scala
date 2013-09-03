@@ -161,7 +161,8 @@ class SparkContext(
     //Regular expression for connection to Mesos cluster
     val MESOS_REGEX = """(mesos://.*)""".r
     // Regular expression for connecting to a Sparrow cluster.
-    val SPARROW_REGEX = """sparrow@([A-Za-z0-9\.]+):([0-9]+)""".r
+    // TODO: Parse the backups and include them for fault tolerance!
+    val SPARROW_REGEX = """sparrow@([A-Za-z0-9\.]+):([0-9]+)[,.*]*""".r
 
     master match {
       case "local" =>
