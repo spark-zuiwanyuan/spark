@@ -51,7 +51,7 @@ import spark.Utils
  */
 class SparrowExecutorBackend extends ExecutorBackend with Logging with BackendService.Iface {
   private val executor = new Executor(
-    "SparrowExecutor", Utils.localHostName, List[(String, String)]())
+    "SparrowExecutor_%s".format(Utils.localHostName), Utils.localHostName, List[(String, String)]())
 
   // TODO: Make this configurable.
   private val nodeMonitorAddress = new InetSocketAddress("localhost", 20501)
