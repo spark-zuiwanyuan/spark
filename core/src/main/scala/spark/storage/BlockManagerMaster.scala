@@ -168,7 +168,7 @@ private[spark] class BlockManagerMaster(var driverActor: ActorRef) extends Loggi
         case ie: InterruptedException => throw ie
         case e: Exception =>
           lastException = e
-          logWarning("Error sending message to BlockManagerMaster in " + attempts + " attempts", e)
+          logWarning("Error sending message to BlockManagerMaster in " + attempts + " attempts")
       }
       Thread.sleep(AKKA_RETRY_INTERVAL_MS)
     }

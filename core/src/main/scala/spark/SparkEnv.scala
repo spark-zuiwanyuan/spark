@@ -137,10 +137,10 @@ object SparkEnv extends Logging {
 
     // set only if unset until now.
     if (System.getProperty("spark.hostPort", null) == null) {
-      if (!isDriver){
+      //if (!isDriver){
         // unexpected
-        Utils.logErrorWithStack("Unexpected NOT to have spark.hostPort set")
-      }
+        //Utils.logErrorWithStack("Unexpected NOT to have spark.hostPort set")
+      //}
       Utils.checkHost(hostname)
       System.setProperty("spark.hostPort", hostname + ":" + boundPort)
     }
