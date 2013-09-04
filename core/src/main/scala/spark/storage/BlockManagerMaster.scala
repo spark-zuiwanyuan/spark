@@ -158,9 +158,11 @@ private[spark] class BlockManagerMaster(var driverActor: ActorRef) extends Loggi
       try {
         val future = driverActor.ask(message)(timeout)
         val result = Await.result(future, timeout)
-        if (result == null) {
-          throw new SparkException("BlockManagerMaster returned null")
-        }
+        // These errors make the Spark logs on the Sparrow slaves much more difficult to look
+        // through.
+        //if (result == null) {
+        //  throw new SparkException("BlockManagerMaster returned null")
+        //}
         return result.asInstanceOf[T]
       } catch {
         case ie: InterruptedException => throw ie
