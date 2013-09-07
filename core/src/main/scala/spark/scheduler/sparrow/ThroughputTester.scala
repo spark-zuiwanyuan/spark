@@ -68,12 +68,14 @@ object ThroughputTester {
       println("****************Launching experiment with %s millisecond tasks".format(
         taskDurationMillis))
       val interarrivalDelay = tasksPerJob * taskDurationMillis / (totalCores * load)
-      println("Launching tasks with interarrival delay %s (to sustain load %s on %s cores)".format(
-        interarrivalDelay, load, totalCores))
+      val interarrivalDelayNanos = (interarrivalDelay * 1000000).toLong
+      println(
+        ("Launching tasks with interarrival delay %sms (%sns) (to sustain load %s on %s cores)").
+         format(interarrivalDelay, interarrivalDelayNanos, load, totalCores))
       val pool = new ScheduledThreadPoolExecutor(200)
       val queryRunnable = new QueryLaunchRunnable(sc, tasksPerJob, taskDurationMillis)
       pool.scheduleAtFixedRate(
-        queryRunnable, 0, (interarrivalDelay * 1000000).toLong, TimeUnit.NANOSECONDS)
+        queryRunnable, 0, interarrivalDelayNanos, TimeUnit.NANOSECONDS)
       val startTime = System.currentTimeMillis
       println("Running experiment for 5 minutes")
       val experimentDurationMillis = 5 * 60 * 1000
