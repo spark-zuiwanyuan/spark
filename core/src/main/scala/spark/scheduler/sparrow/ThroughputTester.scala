@@ -47,49 +47,50 @@ object ThroughputTester {
   }
 
   def main(args: Array[String]) {
-    if (args.length != 5) {
+    if (args.length != 2) {
       System.err.println(
-        "Usage: ThroughputTester master tasks_per_job task_duration total_cores load")
+        "Usage: ThroughputTester master total_cores")
       System.exit(1)
     }
-    var testBuf = new ArrayBuffer[Int]()
-    testBuf += 0
-    testBuf += 1
-    testBuf += 2
-    println("Percentile 0.8: " + get_percentile(testBuf, 0.5))
-    val tasksPerJob = args(1).toInt
-    val taskDurationMillis = args(2).toInt
-    val totalCores = args(3).toInt
-    val load = args(4).toDouble
-    val interarrivalDelay = tasksPerJob * taskDurationMillis / (totalCores * load)
+    val tasksPerJob = 10
+    val taskDurations = List(10000, 1000, 100, 10, 1)
+    val totalCores = args(1).toInt
+    val load = 0.8
 
     val sc = new SparkContext(args(0), "ThroughputTester", System.getenv("SPARK_HOME"), Seq())
-    println("Sleeping to give everythign time to start up")
+    println("Sleeping to give everything time to start up")
     Thread.sleep(10000)
     println("Done sleeping; launching warmup job")
     sc.parallelize(1 to 100000, 100000).map(x => Thread.sleep(1)).count()
     println("Warmup job complete")
 
-    println("Launching tasks with interarrival delay %s (to sustain load %s on %s cores)".format(
-      interarrivalDelay, load, totalCores))
-    val pool = new ScheduledThreadPoolExecutor(200)
-    val queryRunnable = new QueryLaunchRunnable(sc, tasksPerJob, taskDurationMillis)
-    pool.scheduleAtFixedRate(
-      queryRunnable, 0, (interarrivalDelay * 1000000).toLong, TimeUnit.NANOSECONDS)
-    val startTime = System.currentTimeMillis
-    println("Running experiment for 5 minutes")
-    val experimentDurationMillis = 5 * 60 * 1000
-    Thread.sleep(experimentDurationMillis)
-    pool.shutdown()
+    taskDurations.foreach { taskDurationMillis =>
+      println("****************Launching experiment with %s millisecond tasks".format(
+        taskDurationMillis))
+      val interarrivalDelay = tasksPerJob * taskDurationMillis / (totalCores * load)
+      println("Launching tasks with interarrival delay %s (to sustain load %s on %s cores)".format(
+        interarrivalDelay, load, totalCores))
+      val pool = new ScheduledThreadPoolExecutor(200)
+      val queryRunnable = new QueryLaunchRunnable(sc, tasksPerJob, taskDurationMillis)
+      pool.scheduleAtFixedRate(
+        queryRunnable, 0, (interarrivalDelay * 1000000).toLong, TimeUnit.NANOSECONDS)
+      val startTime = System.currentTimeMillis
+      println("Running experiment for 5 minutes")
+      val experimentDurationMillis = 5 * 60 * 1000
+      Thread.sleep(experimentDurationMillis)
+      pool.shutdown()
 
-    if (responseTimes.size == 0) return
-    val sortedResponseTimes = responseTimes.sortWith(_ < _)
-    val writer = new PrintWriter(new File("throughput_results_%s.txt".format(taskDurationMillis)))
-    (0 to 100).foreach { x =>
-      val percentile = x / 100.0
-      writer.write("%s\t%s\n".format(percentile, get_percentile(sortedResponseTimes, percentile)))
+      if (responseTimes.size == 0) return
+      val sortedResponseTimes = responseTimes.sortWith(_ < _)
+      val writer = new PrintWriter(new File("throughput_results_%s.txt".format(taskDurationMillis)))
+      (0 to 100).foreach { x =>
+        val percentile = x / 100.0
+        writer.write("%s\t%s\n".format(percentile, get_percentile(sortedResponseTimes, percentile)))
+      }
+      writer.close()
+      // Sleep for a bit just to make sure things are cleaned up.
+      Thread.sleep(100000)
     }
-    writer.close()
   }
 }
 
