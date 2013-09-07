@@ -53,7 +53,7 @@ object ThroughputTester {
       System.exit(1)
     }
     val tasksPerJob = 10
-    val taskDurations = List(10000, 1000, 100, 10, 1)
+    val taskDurations = List(10000, 1000, 100, 10)
     val totalCores = args(1).toInt
     val load = 0.8
 
