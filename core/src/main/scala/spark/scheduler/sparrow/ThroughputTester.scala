@@ -88,8 +88,9 @@ object ThroughputTester {
         writer.write("%s\t%s\n".format(percentile, get_percentile(sortedResponseTimes, percentile)))
       }
       writer.close()
+      responseTimes.clear()
       // Sleep for a bit just to make sure things are cleaned up.
-      Thread.sleep(100000)
+      Thread.sleep(10000)
     }
   }
 }
