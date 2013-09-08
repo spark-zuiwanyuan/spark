@@ -69,9 +69,15 @@ private[spark] class SparrowScheduler(
       spec
     })
 
-    val description = "%s-%s".format(
-      taskSet.properties.getProperty(SparkContext.SPARK_JOB_DESCRIPTION, ""),
-      taskSet.stageId)
+    val description = {
+      if (taskSet.properties == null) {
+        ""
+      } else {
+        val sparkJobDescription = taskSet.properties.getProperty(
+          SparkContext.SPARK_JOB_DESCRIPTION, "").replace("\n", " ")
+        "%s-%s".format(sparkJobDescription, taskSet.stageId)
+      }
+    }
 
     new Thread(new Runnable() {
       override def run() {

@@ -61,7 +61,7 @@ object ThroughputTester {
     println("Sleeping to give everything time to start up")
     Thread.sleep(10000)
     println("Done sleeping; launching warmup job")
-    sc.parallelize(1 to 100000, 100000).map(x => Thread.sleep(1)).count()
+    sc.parallelize(1 to 1000, 1000).map(x => Thread.sleep(1)).count()
     println("Warmup job complete")
 
     taskDurations.foreach { taskDurationMillis =>
