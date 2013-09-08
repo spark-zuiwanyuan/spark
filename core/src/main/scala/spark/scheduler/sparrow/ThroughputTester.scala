@@ -61,7 +61,7 @@ object ThroughputTester {
     println("Sleeping to give everything time to start up")
     Thread.sleep(10000)
     println("Done sleeping; launching warmup job")
-    //sc.parallelize(1 to 100000, 100000).map(x => Thread.sleep(1)).count()
+    sc.parallelize(1 to 100000, 100000).map(x => Thread.sleep(1)).count()
     println("Warmup job complete")
 
     taskDurations.foreach { taskDurationMillis =>
@@ -105,13 +105,12 @@ object ThroughputTester {
 class QueryLaunchRunnable(sc: SparkContext, numTasks: Int, taskDurationMillis: Int)
   extends Runnable with Logging {
   def run() {
-    println("*****START: " + System.currentTimeMillis)
     val startTime = System.currentTimeMillis
     // This is a hack so that Spark doesn't try to serialize the whole QueryLaunchRunnable object.
     val millis = taskDurationMillis
     sc.parallelize(1 to numTasks, numTasks).map(x => Thread.sleep(millis)).count()
     val responseTime = System.currentTimeMillis - startTime
-    logInfo("QueryTime: " + responseTime)
+    logInfo("QueryTime: %s (for start time %s)".format(responseTime, startTime))
     ThroughputTester.responseTimes += responseTime.toInt
   }
 }
