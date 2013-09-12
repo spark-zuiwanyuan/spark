@@ -498,7 +498,7 @@ private[spark] class BlockManager(
    * Get a block from the block manager (either local or remote).
    */
   def get(blockId: String): Option[Iterator[Any]] = {
-    getLocal(blockId).orElse(getRemote(blockId))
+    getLocal(blockId) //.orElse(getRemote(blockId))
   }
 
   /**
