@@ -47,13 +47,14 @@ object ThroughputTester {
   }
 
   def main(args: Array[String]) {
-    if (args.length != 2) {
+    if (args.length != 3) {
       System.err.println(
-        "Usage: ThroughputTester master total_cores")
+        "Usage: ThroughputTester master total_cores task_durations")
       System.exit(1)
     }
     val tasksPerJob = 10
-    val taskDurations = List(10000, 1000, 100, 10)
+    val taskDurations = args(2).split(",").map(_.toInt)
+    println("Using task durations %s".format(taskDurations))
     val totalCores = args(1).toInt
     val load = 0.8
 
