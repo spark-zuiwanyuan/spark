@@ -33,6 +33,7 @@ import SparkContext._
  */
 object ThroughputTester {
   var responseTimes = new ArrayBuffer[Int]() with SynchronizedBuffer[Int]
+  val THREAD_POOL_SIZE = 500
 
   def get_percentile(values: ArrayBuffer[Int], percent: Double): Double = {
     val index = (values.size - 1) * percent
@@ -47,13 +48,14 @@ object ThroughputTester {
   }
 
   def main(args: Array[String]) {
-    if (args.length != 3) {
+    if (args.length != 4) {
       System.err.println(
-        "Usage: ThroughputTester master total_cores task_durations")
+        "Usage: ThroughputTester master total_cores experiment_duration task_durations")
       System.exit(1)
     }
     val tasksPerJob = 10
-    val taskDurations = args(2).split(",").map(_.toInt)
+    val experimentDuration = args(2).toLong
+    val taskDurations = args(3).split(",").map(_.toInt)
     println("Using task durations %s".format(taskDurations))
     val totalCores = args(1).toInt
     val load = 0.8
@@ -72,20 +74,20 @@ object ThroughputTester {
       println(
         ("Launching tasks with interarrival delay %sms (to sustain load %s on %s cores)").
          format(interarrivalDelay, load, totalCores))
-      val pool = new ScheduledThreadPoolExecutor(200)
+      val pool = new ScheduledThreadPoolExecutor(THREAD_POOL_SIZE)
       // Can't uuse scheudleAtFixedRate because each runnable may take longer than
       // the interarrival delay, which is not supported.
       // Start after a delay, so that we can schedule everything before any queries start.
       var startDelay = 20 * 1000
       var cumulativeDelay = 0.0
-      val experimentDurationMillis = 5 * 60 * 1000
-      while (cumulativeDelay < experimentDurationMillis) {
-        val queryRunnable = new QueryLaunchRunnable(sc, tasksPerJob, taskDurationMillis)
+      while (cumulativeDelay < experimentDuration) {
+        val expectedStartTime = (startDelay + cumulativeDelay + System.currentTimeMillis).toLong
+        val queryRunnable = new QueryLaunchRunnable(sc, tasksPerJob, taskDurationMillis, expectedStartTime)
         val delay = ((startDelay + cumulativeDelay) * 1000000).toLong
         pool.schedule(queryRunnable, delay.toLong, TimeUnit.NANOSECONDS)
         cumulativeDelay += interarrivalDelay
       }
-      Thread.sleep(experimentDurationMillis + startDelay)
+      Thread.sleep(experimentDuration + startDelay)
       pool.shutdown()
 
       if (responseTimes.size == 0) return
@@ -103,15 +105,14 @@ object ThroughputTester {
   }
 }
 
-class QueryLaunchRunnable(sc: SparkContext, numTasks: Int, taskDurationMillis: Int)
+class QueryLaunchRunnable(sc: SparkContext, numTasks: Int, taskDurationMillis: Int, expectedStartTime: Long)
   extends Runnable with Logging {
   def run() {
-    val startTime = System.currentTimeMillis
     // This is a hack so that Spark doesn't try to serialize the whole QueryLaunchRunnable object.
     val millis = taskDurationMillis
     sc.parallelize(1 to numTasks, numTasks).map(x => Thread.sleep(millis)).count()
-    val responseTime = System.currentTimeMillis - startTime
-    logInfo("QueryTime: %s (for start time %s)".format(responseTime, startTime))
+    val responseTime = System.currentTimeMillis - expectedStartTime
+    logInfo("QueryTime: %s (for start time %s)".format(responseTime, expectedStartTime))
     ThroughputTester.responseTimes += responseTime.toInt
   }
 }
