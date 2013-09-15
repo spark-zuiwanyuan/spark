@@ -89,6 +89,7 @@ object ThroughputTester {
       }
       Thread.sleep(experimentDuration + startDelay)
       pool.shutdown()
+      pool.awaitTermination(5, TimeUnit.MINUTES)
 
       if (responseTimes.size == 0) return
       val sortedResponseTimes = responseTimes.sortWith(_ < _)
