@@ -25,8 +25,7 @@ import org.apache.spark.Logging
  * A public object that provides HBase support.
  * You could save RDD into HBase through [[org.apache.spark.nosql.hbase.HBaseUtils.saveAsHBaseTable]] method.
  */
-object HBaseUtils
-  extends Logging {
+object HBaseUtils extends Logging {
 
   /**
    * Save [[org.apache.spark.rdd.RDD[Text]]] as a HBase table

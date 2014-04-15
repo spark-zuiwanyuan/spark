@@ -22,6 +22,7 @@ import org.apache.hadoop.io.Text
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.commons.codec.binary.Hex
 import org.apache.hadoop.hbase.HConstants
+import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.conf.Configuration
 import java.io.IOException
 import org.apache.spark.Logging
@@ -32,8 +33,7 @@ import org.apache.spark.Logging
  * functions, but this class should not be used directly by users.
  */
 private[hbase]
-class SparkHBaseWriter(conf: HBaseConf)
-  extends Logging {
+class SparkHBaseWriter(conf: HBaseConf) extends Logging {
 
   private var htable: HTable = null
 
@@ -46,7 +46,7 @@ class SparkHBaseWriter(conf: HBaseConf)
   val delimiter = conf.delimiter
 
   def init() {
-    val conf = new Configuration()
+    val conf = HBaseConfiguration.create()
     conf.set(HConstants.ZOOKEEPER_QUORUM, zkHost)
     conf.set(HConstants.ZOOKEEPER_CLIENT_PORT, zkPort)
     conf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, zkNode)
@@ -81,20 +81,34 @@ class SparkHBaseWriter(conf: HBaseConf)
    */
   def write(record: Text) = {
     val fields = record.toString.split(delimiter)
+    
+    if (columns.isEmpty)
+    {
+      logWarning(s"collumns is unacceptable.")
+    } else{
+      // Check the format of record
+      val k = columns.length
+      if (fields.size > columns.length) {
+        //insert the null
+        List.range(fields.size, k) foreach {
+          i => {
+            val b = columns.last.qualifier
+            b.update(b.length-1, (b.last+1).toByte)
+            columns :+ new HBaseColumn(columns.last.family, b, columns.last.typ)
+          }
+        }
+      }
+    
+      val put = new Put(columns(0).family)
 
-    // Check the format of record
-    if (fields.size == columns.length + 1) {
-      val put = new Put(toByteArray(fields(0), rowkeyType))
-
-      List.range(1, fields.size) foreach {
-        i => put.add(columns(i - 1).family, columns(i - 1).qualifier,
-          toByteArray(fields(i), columns(i - 1).typ))
+      List.range(0, fields.size) foreach {
+        i => put.add(columns(i).family, columns(i).qualifier,
+          toByteArray(fields(i), columns(i).typ))
       }
 
       htable.put(put)
-    } else {
-      logWarning(s"Record ($record) is unacceptable.")
     }
+
   }
 
   def close() {
