@@ -31,20 +31,6 @@
   <name>Spark Project External HBase</name>
   <url>http://spark.apache.org/</url>
 
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>HDPReleases</id>
-      <name>HDP Releases</name>
-      <url>http://repo.hortonworks.com/content/repositories/releases/</url>
-    </repository>
-  </repositories> 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -61,36 +47,36 @@
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-client</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-client</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-server</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-server</artifactId>
-      <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <version>0.96.0-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
