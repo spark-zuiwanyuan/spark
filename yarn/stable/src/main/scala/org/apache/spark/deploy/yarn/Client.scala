@@ -495,7 +495,8 @@ object Client {
 
   // Based on code from org.apache.hadoop.mapreduce.v2.util.MRApps
   def populateHadoopClasspath(conf: Configuration, env: HashMap[String, String]) {
-    for (c <- conf.getStrings(YarnConfiguration.YARN_APPLICATION_CLASSPATH)) {
+    val clh = if (YarnConfiguration.YARN_APPLICATION_CLASSPATH.isEmpty) (YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH.mkString(";")) else YarnConfiguration.YARN_APPLICATION_CLASSPATH
+    for (c <- conf.getStrings(clh)) {
       Apps.addToEnvironment(env, Environment.CLASSPATH.name, c.trim)
     }
   }
