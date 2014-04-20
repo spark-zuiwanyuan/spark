@@ -47,36 +47,36 @@
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-client</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-client</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-server</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-server</artifactId>
-      <version>0.96.0-hadoop2</version>
+      <version>0.96.0.2.0.6.0-76-hadoop2</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
