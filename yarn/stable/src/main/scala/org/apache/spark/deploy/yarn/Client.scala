@@ -492,11 +492,12 @@ object Client {
 
     new Client(args, sparkConf).run()
   }
-
+  
   // Based on code from org.apache.hadoop.mapreduce.v2.util.MRApps
   def populateHadoopClasspath(conf: Configuration, env: HashMap[String, String]) {
-    val clh = if (YarnConfiguration.YARN_APPLICATION_CLASSPATH.isEmpty) (YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH.mkString(";")) else YarnConfiguration.YARN_APPLICATION_CLASSPATH
-    for (c <- conf.getStrings(clh)) {
+    val classpathEntries = Option(conf.getStrings(YarnConfiguration.YARN_APPLICATION_CLASSPATH)).getOrElse(
+        YarnConfiguration.DEFAULT_YARN_APPLICATION_CLASSPATH)
+    for (c <- classpathEntries) {
       Apps.addToEnvironment(env, Environment.CLASSPATH.name, c.trim)
     }
   }

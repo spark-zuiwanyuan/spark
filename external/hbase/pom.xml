@@ -26,7 +26,7 @@
   </parent>
 
   <groupId>org.apache.spark</groupId>
-  <artifactId>spark-nosql-hbase</artifactId>
+  <artifactId>spark-nosql-hbase_2.10</artifactId>
   <packaging>jar</packaging>
   <name>Spark Project External HBase</name>
   <url>http://spark.apache.org/</url>
@@ -72,6 +72,8 @@
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-server</artifactId>
       <version>0.96.0.2.0.6.0-76-hadoop2</version>
+      <type>jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>

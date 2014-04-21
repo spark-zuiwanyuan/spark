@@ -29,9 +29,11 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.api.java.{JavaStreamingContext, JavaPairDStream}
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.rdd.RDD
+import org.apache.spark.Logging
 
 
-object KafkaUtils {
+object KafkaUtils extends Logging {
   /**
    * Create an input stream that pulls messages from a Kafka Broker.
    * @param ssc       StreamingContext object
@@ -149,5 +151,27 @@ object KafkaUtils {
 
     createStream[K, V, U, T](
       jssc.ssc, kafkaParams.toMap, Map(topics.mapValues(_.intValue()).toSeq: _*), storageLevel)
+  }
+  
+  def saveAsKafka(rdd: RDD[String], brStr: String){
+    def writeToKafka(iter: Iterator[String]){
+      val writer = new KafaProducer(brStr)
+      
+      try{
+        writer.init()
+        while (iter.hasNext) {
+          val record = iter.next()
+          writer.produce(record)
+        }
+      } finally {
+        try {
+          writer.close()
+        } catch {
+          case ex: Exception => logWarning("Close kafka producer failed.", ex)
+        }
+      }
+    }
+    
+    rdd.foreachPartition(writeToKafka)
   }
 }
