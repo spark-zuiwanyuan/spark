@@ -82,7 +82,7 @@ object SparkBuild extends Build {
   lazy val mllib = Project("mllib", file("mllib"), settings = mllibSettings) dependsOn(core)
 
   lazy val assemblyProj = Project("assembly", file("assembly"), settings = assemblyProjSettings)
-    .dependsOn(core, graphx, bagel, mllib, streaming, repl, sql) dependsOn(maybeYarn: _*) dependsOn(maybeHive: _*) dependsOn(maybeGanglia: _*)
+    .dependsOn(core, graphx, bagel, mllib, streaming, repl, sql, hive, externalFlume, externalKafka) dependsOn(maybeYarn: _*) dependsOn(maybeHive: _*) dependsOn(maybeGanglia: _*)
 
   lazy val assembleDeps = TaskKey[Unit]("assemble-deps", "Build assembly of dependencies and packages Spark projects")
 
@@ -596,7 +596,7 @@ object SparkBuild extends Build {
     previousArtifact := sparkPreviousArtifact("spark-streaming-kafka"),
     libraryDependencies ++= Seq(
       "com.github.sgroschupf"    % "zkclient"   % "0.1"          excludeAll(excludeNetty),
-      "org.apache.kafka"        %% "kafka"      % "0.8.0"
+      "org.apache.kafka"        %% "kafka"      % "0.8.1"
         exclude("com.sun.jdmk", "jmxtools")
         exclude("com.sun.jmx", "jmxri")
         exclude("net.sf.jopt-simple", "jopt-simple")
