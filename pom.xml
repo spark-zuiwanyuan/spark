@@ -101,6 +101,7 @@
     <module>external/flume</module>
     <module>external/zeromq</module>
     <module>external/mqtt</module>
+    <module>external/hbase</module>
     <module>examples</module>
   </modules>
 
@@ -184,6 +185,17 @@
       <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
       <releases>
         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>HDPReleases</id>
+      <name>HDP Releases</name>
+	  <url>http://repo.hortonworks.com/content/repositories/releases/</url>
+      <releases>
+		<enabled>true</enabled>
       </releases>
       <snapshots>
         <enabled>false</enabled>

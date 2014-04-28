@@ -82,7 +82,7 @@ object SparkBuild extends Build {
   lazy val mllib = Project("mllib", file("mllib"), settings = mllibSettings) dependsOn(core)
 
   lazy val assemblyProj = Project("assembly", file("assembly"), settings = assemblyProjSettings)
-    .dependsOn(core, graphx, bagel, mllib, streaming, repl, sql, hive, externalFlume, externalKafka) dependsOn(maybeYarn: _*) dependsOn(maybeHive: _*) dependsOn(maybeGanglia: _*)
+    .dependsOn(core, graphx, bagel, mllib, streaming, repl, sql, hive, externalFlume, externalKafka, externalHBase) dependsOn(maybeYarn: _*) dependsOn(maybeHive: _*) dependsOn(maybeGanglia: _*)
 
   lazy val assembleDeps = TaskKey[Unit]("assemble-deps", "Build assembly of dependencies and packages Spark projects")
 
@@ -149,8 +149,11 @@ object SparkBuild extends Build {
   lazy val externalMqtt = Project("external-mqtt", file("external/mqtt"), settings = mqttSettings)
     .dependsOn(streaming % "compile->compile;test->test")
 
-  lazy val allExternal = Seq[ClasspathDependency](externalTwitter, externalKafka, externalFlume, externalZeromq, externalMqtt)
-  lazy val allExternalRefs = Seq[ProjectReference](externalTwitter, externalKafka, externalFlume, externalZeromq, externalMqtt)
+  lazy val externalHBase = Project("external-hbase", file("external/hbase"), settings = hbaseSettings)
+   	.dependsOn(core % "compile->compile;test->test", sql % "compile->compile;test->test")
+  
+  lazy val allExternal = Seq[ClasspathDependency](externalTwitter, externalKafka, externalFlume, externalZeromq, externalMqtt, externalHBase)
+  lazy val allExternalRefs = Seq[ProjectReference](externalTwitter, externalKafka, externalFlume, externalZeromq, externalMqtt, externalHBase)
 
   lazy val examples = Project("examples", file("examples"), settings = examplesSettings)
     .dependsOn(core, mllib, graphx, bagel, streaming, hive) dependsOn(allExternal: _*)
@@ -476,6 +479,21 @@ object SparkBuild extends Build {
       "com.twitter" % "parquet-hadoop" % parquetVersion
     )
   )
+  
+  def hbaseSettings() = sharedSettings ++ Seq(
+    name := "spark-nosql-hbase",
+    previousArtifact := sparkPreviousArtifact("spark-nosql-hbase"),
+    resolvers ++= "HDPReleases" at "http://repo.hortonworks.com/content/repositories/releases/"
+    libraryDependencies ++= Seq(
+      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-server"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hadoop"          % hadoopClient       % hadoopVersion excludeAll(excludeNetty, excludeAsm, excludeCommonsLogging, excludeSLF4J, excludeOldAsm),
+      "org.apache.hadoop"          % "hadoop-test"      % hadoopVersion % "test" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging)
+    )
+  ) 
 
   // Since we don't include hive in the main assembly this project also acts as an alternative
   // assembly jar.
