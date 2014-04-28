@@ -23,6 +23,9 @@ import org.apache.spark.{SparkContext, LocalSparkContext}
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HConstants, HBaseTestingUtility}
 import org.apache.hadoop.hbase.client.{Scan, HTable}
+import org.apache.spark.sql.catalyst.types.{FloatType, StringType}
+import org.apache.spark.sql.TestData
+import org.apache.spark.sql.test.TestSQLContext._
 
 class HBaseSuite
   extends FunSuite
@@ -44,10 +47,10 @@ class HBaseSuite
     val nums = sc.makeRDD(1 to 3).map(x => new Text("a" + x + " 1.0"))
 
     val table = "test1"
-    val rowkeyType = "string"
+    val rowkeyType = StringType
     val cfBytes = Bytes.toBytes("cf")
     val qualBytes = Bytes.toBytes("qual0")
-    val columns = List[HBaseColumn](new HBaseColumn(cfBytes, qualBytes, "float"))
+    val columns = List[HBaseColumn](new HBaseColumn(cfBytes, qualBytes, FloatType))
     val delimiter = ' '
 
     util.createTable(Bytes.toBytes(table), cfBytes)

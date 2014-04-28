@@ -49,7 +49,7 @@ object HBaseUtils extends Logging {
    * @param delimiter the delimiter which used to split record into fields
    */
   def saveAsHBaseTable(rdd: RDD[Text], zkHost: String, zkPort: String, zkNode: String,
-                       table: String, rowkeyType: String, columns: List[HBaseColumn], delimiter: Char) {
+                       table: String, rowkeyType: DataType, columns: List[HBaseColumn], delimiter: Char) {
     val conf = new HBaseConf(zkHost, zkPort, zkNode, table, rowkeyType, columns, delimiter)
 
     def writeToHBase(iter: Iterator[Text]) {
@@ -98,7 +98,7 @@ object HBaseUtils extends Logging {
     for (i <- 1 to attributes.length - 1) {
       val attribute = attributes(i)
       val qualifier = Bytes.toBytes(attribute.name)
-      columns = columns :+ new HBaseColumn(family, qualifier, attribute.dataType)
+      columns = columns :+ new HBaseColumn(family, qualifier, attribute(i).dataType)
     }
     val conf = new HBaseConf(zkHost, zkPort, zkNode, table, rowkeyType, columns, ',')
     
