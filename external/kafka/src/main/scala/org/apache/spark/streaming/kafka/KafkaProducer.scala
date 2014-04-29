@@ -31,6 +31,7 @@ class KafaProducer(brStr: String) extends Logging{
   def init(){
     val props = new Properties()
     props.put("metadata.broker.list", brStr)
+    props.put("serializer.class", "kafka.serializer.StringEncoder")
     props.put("request.required.acks", "1")
     val config = new ProducerConfig(props)
     prod = new Producer[String, String](config)
