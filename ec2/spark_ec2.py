@@ -444,7 +444,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
 
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
-  ssh(master, opts, "rm -rf spark-ec2 && git clone https://github.com/mesos/spark-ec2.git -b v2")
+  ssh(master, opts, "rm -rf spark-ec2 && git clone https://github.com/mesos/spark-ec2.git -b v3")
 
   print "Deploying files to master..."
   deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
@@ -613,7 +613,7 @@ def ssh_command(opts):
   return ['ssh'] + ssh_args(opts)
 
 
-# Run a command on a host through ssh, retrying up to two times
+# Run a command on a host through ssh, retrying up to five times
 # and then throwing an exception if ssh continues to fail.
 def ssh(host, opts, command):
   tries = 0
@@ -622,7 +622,7 @@ def ssh(host, opts, command):
       return subprocess.check_call(
         ssh_command(opts) + ['-t', '-t', '%s@%s' % (opts.user, host), stringify_command(command)])
     except subprocess.CalledProcessError as e:
-      if (tries > 2):
+      if (tries > 5):
         # If this was an ssh failure, provide the user with hints.
         if e.returncode == 255:
           raise UsageError("Failed to SSH to remote host {0}.\nPlease check that you have provided the correct --identity-file and --key-pair parameters and try again.".format(host))
@@ -649,7 +649,7 @@ def ssh_write(host, opts, command, input):
     status = proc.wait()
     if status == 0:
       break
-    elif (tries > 2):
+    elif (tries > 5):
       raise RuntimeError("ssh_write failed with error %s" % proc.returncode)
     else:
       print >> stderr, "Error {0} while executing remote command, retrying after 30 seconds".format(status)
@@ -815,6 +815,7 @@ def main():
     real_main()
   except UsageError, e:
     print >> stderr, "\nError:\n", e
+    sys.exit(1)
 
 
 if __name__ == "__main__":
