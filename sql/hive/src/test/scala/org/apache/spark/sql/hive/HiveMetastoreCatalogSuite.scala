@@ -15,28 +15,18 @@
  * limitations under the License.
  */
 
-import org.apache.spark.api.java.*;
-import org.apache.spark.api.java.function.Function;
+package org.apache.spark.sql.hive
 
-public class SimpleApp {
-  public static void main(String[] args) {
-    String logFile = "input.txt";
-    JavaSparkContext sc = new JavaSparkContext("local", "Simple App");
-    JavaRDD<String> logData = sc.textFile(logFile).cache();
+import org.scalatest.FunSuite
 
-    long numAs = logData.filter(new Function<String, Boolean>() {
-      public Boolean call(String s) { return s.contains("a"); }
-    }).count();
+import org.apache.spark.sql.catalyst.types.{DataType, StructType}
 
-    long numBs = logData.filter(new Function<String, Boolean>() {
-      public Boolean call(String s) { return s.contains("b"); }
-    }).count();
+class HiveMetastoreCatalogSuite extends FunSuite {
 
-   if (numAs != 2 || numBs != 2) {
-     System.out.println("Failed to parse log files with Spark");
-     System.exit(-1);
-   }
-   System.out.println("Test succeeded");
-   sc.stop();
+  test("struct field should accept underscore in sub-column name") {
+    val metastr = "struct<a: int, b_1: string, c: string>"
+
+    val datatype = HiveMetastoreTypes.toDataType(metastr)
+    assert(datatype.isInstanceOf[StructType])
   }
 }
