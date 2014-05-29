@@ -213,6 +213,7 @@ object SparkBuild extends Build {
       "JBoss Repository"     at "https://repository.jboss.org/nexus/content/repositories/releases/",
       "MQTT Repository"      at "https://repo.eclipse.org/content/repositories/paho-releases/",
       "Cloudera Repository"  at "http://repository.cloudera.com/artifactory/cloudera-repos/",
+      "HDPReleases" at "http://repo.hortonworks.com/content/repositories/releases/",
       // For Sonatype publishing
       // "sonatype-snapshots"   at "https://oss.sonatype.org/content/repositories/snapshots",
       // "sonatype-staging"     at "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
@@ -491,15 +492,13 @@ object SparkBuild extends Build {
   def hbaseSettings() = sharedSettings ++ Seq(
     name := "spark-nosql-hbase",
     previousArtifact := sparkPreviousArtifact("spark-nosql-hbase"),
-    resolvers ++= "HDPReleases" at "http://repo.hortonworks.com/content/repositories/releases/"
     libraryDependencies ++= Seq(
-      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
-      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
-      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
-      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
-      "org.apache.hbase"           % "hbase-server"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging),
-      "org.apache.hadoop"          % hadoopClient       % hadoopVersion excludeAll(excludeNetty, excludeAsm, excludeCommonsLogging, excludeSLF4J, excludeOldAsm),
-      "org.apache.hadoop"          % "hadoop-test"      % hadoopVersion % "test" excludeAll(excludeNetty, excludeAsm, excludeOldAsm, excludeCommonsLogging)
+      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-client"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" excludeAll(excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-common"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hbase"           % "hbase-server"            % "0.96.0.2.0.6.0-76-hadoop2" % "test" classifier "tests" excludeAll(excludeAsm, excludeOldAsm, excludeCommonsLogging),
+      "org.apache.hadoop"          % hadoopClient       % hadoopVersion excludeAll(excludeAsm, excludeCommonsLogging, excludeSLF4J, excludeOldAsm)
     )
   ) 
 
