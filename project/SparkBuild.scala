@@ -174,7 +174,7 @@ object SparkBuild extends Build {
       "-target:" + SCALAC_JVM_VERSION),
     javacOptions := Seq("-target", JAVAC_JVM_VERSION, "-source", JAVAC_JVM_VERSION),
     unmanagedJars in Compile <<= baseDirectory map { base => (base / "lib" ** "*.jar").classpath },
-    retrieveManaged := true,
+    //retrieveManaged := true,
     javaHome := Properties.envOrNone("JAVA_HOME").map(file),
     // This is to add convenience of enabling sbt -Dsbt.offline=true for making the build offline.
     offline := "true".equalsIgnoreCase(sys.props("sbt.offline")),
