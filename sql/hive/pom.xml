@@ -48,6 +48,11 @@
       <version>${hive.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>parquet-hive-storage-handler</artifactId>
+      <version>${parquet.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.spark-project.hive</groupId>
       <artifactId>hive-exec</artifactId>
       <version>${hive.version}</version>

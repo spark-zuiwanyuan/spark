@@ -210,12 +210,12 @@ object SparkBuild extends Build {
 
     resolvers ++= Seq(
       // HTTPS is unavailable for Maven Central
+      "HDPReleases" at "http://repo.hortonworks.com/content/repositories/releases/",
+      "Cloudera Repository"  at "http://repository.cloudera.com/artifactory/cloudera-repos/",
       "Maven Repository"     at "http://repo.maven.apache.org/maven2",
       "Apache Repository"    at "https://repository.apache.org/content/repositories/releases",
       "JBoss Repository"     at "https://repository.jboss.org/nexus/content/repositories/releases/",
       "MQTT Repository"      at "https://repo.eclipse.org/content/repositories/paho-releases/",
-      "Cloudera Repository"  at "http://repository.cloudera.com/artifactory/cloudera-repos/",
-      "HDPReleases" at "http://repo.hortonworks.com/content/repositories/releases/",
       // For Sonatype publishing
       // "sonatype-snapshots"   at "https://oss.sonatype.org/content/repositories/snapshots",
       // "sonatype-staging"     at "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
@@ -513,7 +513,8 @@ object SparkBuild extends Build {
     libraryDependencies ++= Seq(
       "org.spark-project.hive" % "hive-metastore" % hiveVersion,
       "org.spark-project.hive" % "hive-exec"      % hiveVersion excludeAll(excludeCommonsLogging),
-      "org.spark-project.hive" % "hive-serde"     % hiveVersion
+      "org.spark-project.hive" % "hive-serde"     % hiveVersion,
+      "com.twitter" % "parquet-hive-storage-handler" % parquetVersion
     ),
     // Multiple queries rely on the TestHive singleton.  See comments there for more details.
     parallelExecution in Test := false,
