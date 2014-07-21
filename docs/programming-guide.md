@@ -145,7 +145,7 @@ that contains information about your application.
 
 {% highlight python %}
 conf = SparkConf().setAppName(appName).setMaster(master)
-sc = SparkContext(conf)
+sc = SparkContext(conf=conf)
 {% endhighlight %}
 
 </div>
@@ -379,10 +379,12 @@ Some notes on reading files with Spark:
 * The `textFile` method also takes an optional second argument for controlling the number of slices of the file. By default, Spark creates one slice for each block of the file (blocks being 64MB by default in HDFS), but you can also ask for a higher number of slices by passing a larger value. Note that you cannot have fewer slices than blocks.
 
 Apart reading files as a collection of lines,
-`SparkContext.wholeTextFiles` lets you read a directory containing multiple small text files, and returns each of them as (filename, content) pairs. This is in contrast with `textFile`, which would return one record per line in each file.
+
+* `SparkContext.wholeTextFiles` lets you read a directory containing multiple small text files, and returns each of them as (filename, content) pairs. This is in contrast with `textFile`, which would return one record per line in each file.
+
+* `RDD.saveAsPickleFile` and `SparkContext.pickleFile` support saving an RDD in a simple format consisting of pickled Python objects. Batching is used on pickle serialization, with default batch size 10.
 
 </div>
-
 
 </div>
 
@@ -659,7 +661,7 @@ def doStuff(self, rdd):
 
 While most Spark operations work on RDDs containing any type of objects, a few special operations are
 only available on RDDs of key-value pairs.
-The most common ones are distibuted "shuffle" operations, such as grouping or aggregating the elements
+The most common ones are distributed "shuffle" operations, such as grouping or aggregating the elements
 by a key.
 
 In Scala, these operations are automatically available on RDDs containing
@@ -682,13 +684,18 @@ val counts = pairs.reduceByKey((a, b) => a + b)
 We could also use `counts.sortByKey()`, for example, to sort the pairs alphabetically, and finally
 `counts.collect()` to bring them back to the driver program as an array of objects.
 
+**Note:** when using custom objects as the key in key-value pair operations, you must be sure that a
+custom `equals()` method is accompanied with a matching `hashCode()` method.  For full details, see
+the contract outlined in the [Object.hashCode()
+documentation](http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html#hashCode()).
+
 </div>
 
 <div data-lang="java" markdown="1">
 
 While most Spark operations work on RDDs containing any type of objects, a few special operations are
 only available on RDDs of key-value pairs.
-The most common ones are distibuted "shuffle" operations, such as grouping or aggregating the elements
+The most common ones are distributed "shuffle" operations, such as grouping or aggregating the elements
 by a key.
 
 In Java, key-value pairs are represented using the 
@@ -714,6 +721,10 @@ JavaPairRDD<String, Integer> counts = pairs.reduceByKey((a, b) -> a + b);
 We could also use `counts.sortByKey()`, for example, to sort the pairs alphabetically, and finally
 `counts.collect()` to bring them back to the driver program as an array of objects.
 
+**Note:** when using custom objects as the key in key-value pair operations, you must be sure that a
+custom `equals()` method is accompanied with a matching `hashCode()` method.  For full details, see
+the contract outlined in the [Object.hashCode()
+documentation](http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html#hashCode()).
 
 </div>
 
@@ -721,7 +732,7 @@ We could also use `counts.sortByKey()`, for example, to sort the pairs alphabeti
 
 While most Spark operations work on RDDs containing any type of objects, a few special operations are
 only available on RDDs of key-value pairs.
-The most common ones are distibuted "shuffle" operations, such as grouping or aggregating the elements
+The most common ones are distributed "shuffle" operations, such as grouping or aggregating the elements
 by a key.
 
 In Python, these operations work on RDDs containing built-in Python tuples such as `(1, 2)`.
@@ -810,7 +821,7 @@ for details.
 </tr>
 <tr>
   <td> <b>reduceByKey</b>(<i>func</i>, [<i>numTasks</i>]) </td>
-  <td> When called on a dataset of (K, V) pairs, returns a dataset of (K, V) pairs where the values for each key are aggregated using the given reduce function. Like in <code>groupByKey</code>, the number of reduce tasks is configurable through an optional second argument. </td>
+  <td> When called on a dataset of (K, V) pairs, returns a dataset of (K, V) pairs where the values for each key are aggregated using the given reduce function <i>func</i>, which must be of type (V,V) => V. Like in <code>groupByKey</code>, the number of reduce tasks is configurable through an optional second argument. </td>
 </tr>
 <tr>
   <td> <b>sortByKey</b>([<i>ascending</i>], [<i>numTasks</i>]) </td>
@@ -974,7 +985,10 @@ storage levels is:
   <td> Store RDD in serialized format in <a href="http://tachyon-project.org">Tachyon</a>.
     Compared to MEMORY_ONLY_SER, OFF_HEAP reduces garbage collection overhead and allows executors
     to be smaller and to share a pool of memory, making it attractive in environments with
-    large heaps or multiple concurrent applications.
+    large heaps or multiple concurrent applications. Furthermore, as the RDDs reside in Tachyon,
+    the crash of an executor does not lead to losing the in-memory cache. In this mode, the memory 
+    in Tachyon is discardable. Thus, Tachyon does not attempt to reconstruct a block that it evicts
+    from memory.
   </td>
 </tr>
 </table>

@@ -297,7 +297,7 @@ class SparkContext(config: SparkConf) extends Logging {
 
   // Set SPARK_USER for user who is running SparkContext.
   val sparkUser = Option {
-    Option(System.getProperty("user.name")).getOrElse(System.getenv("SPARK_USER"))
+    Option(System.getenv("SPARK_USER")).getOrElse(System.getProperty("user.name"))
   }.getOrElse {
     SparkContext.SPARK_UNKNOWN_USER
   }
@@ -823,9 +823,11 @@ class SparkContext(config: SparkConf) extends Logging {
   }
 
   /**
+   * :: DeveloperApi ::
    * Return information about what RDDs are cached, if they are in mem or on disk, how much space
    * they take, etc.
    */
+  @DeveloperApi
   def getRDDStorageInfo: Array[RDDInfo] = {
     StorageUtils.rddInfoFromStorageStatus(getExecutorStorageStatus, this)
   }
@@ -837,8 +839,10 @@ class SparkContext(config: SparkConf) extends Logging {
   def getPersistentRDDs: Map[Int, RDD[_]] = persistentRdds.toMap
 
   /**
+   * :: DeveloperApi ::
    * Return information about blocks stored in all of the slaves
    */
+  @DeveloperApi
   def getExecutorStorageStatus: Array[StorageStatus] = {
     env.blockManager.master.getStorageStatus
   }
@@ -1261,7 +1265,7 @@ class SparkContext(config: SparkConf) extends Logging {
  */
 object SparkContext extends Logging {
 
-  private[spark] val SPARK_VERSION = "1.0.0"
+  private[spark] val SPARK_VERSION = "1.0.2"
 
   private[spark] val SPARK_JOB_DESCRIPTION = "spark.job.description"
 
