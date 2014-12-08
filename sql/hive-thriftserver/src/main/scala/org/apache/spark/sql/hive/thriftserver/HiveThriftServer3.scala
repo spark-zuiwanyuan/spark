@@ -100,6 +100,7 @@ private[hive] class HiveThriftServer3(hiveContext: HiveContext)
   
   val queue = new ArrayBlockingQueue[String](3)
   val map = Map[String, String]()
+  val hadoopConf = hiveContext.sparkContext.hadoopConfiguration
   
   def receiveWithLogging = {
     case RegisterTable(filePath, tableName) => 
@@ -129,7 +130,7 @@ private[hive] class HiveThriftServer3(hiveContext: HiveContext)
   
   private def delCpFile(filePath: String) {
     val path = new Path(filePath)
-    val fs = path.getFileSystem(hiveContext.sparkContext.hadoopConfiguration)
+    val fs = path.getFileSystem(hadoopConf)
     fs.delete(path, true)
   }
 }
